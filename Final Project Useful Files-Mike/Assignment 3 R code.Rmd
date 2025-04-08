@@ -1,0 +1,240 @@
+---
+title: "Assignment 3 R code"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+Load Library and reading the sample data:
+```{r}
+library(tidyverse)
+library(haven)
+library(stargazer)
+
+df <- read_dta("cen_ind_2021_pumf_v2.dta")
+head(df)
+```
+
+```{r}
+data1 <- df |> 
+  mutate(agegrp = as.numeric(agegrp)) |>
+  filter(agegrp>=17 & agegrp!=88)
+```
+
+
+
+## Data Filtering & Rationail
+
+We start by excluding cases where `pkids` or `lfact` are not available or not applicable. Then we create a binary `Retired` variable based on `lfact` codes 11, 12, and 13.
+
+```{r}
+df <- df %>%
+  # 1) Exclude PKIDS = 8 or 9 (not available / not applicable)
+  filter(agegrp %in% c(13, 14, 15, 16, 17, 18, 19, 20, 21)) %>%
+  
+  # 2) Exclude LFACT = 88 or 99 (not available / not applicable)
+  filter(!lfact %in% c(14, 88, 99)) %>%
+  
+  # 3) Define Retired = 1 if LFACT is 11, 12, or 13, else 0
+  mutate(
+    Retired = if_else(lfact %in% c(11, 12, 13), 1, 0)
+  )
+
+#table(df$pkids, useNA = "ifany")       # Should show only 0 or 1 now
+#table(df$lfact, useNA = "ifany")       # No 88 or 99
+#table(df$Retired, useNA = "ifany")     # Distribution of your new retired indicator
+
+#df_selected <- df %>%
+  select(pkids, lfact, Retired)
+
+# Print the first few rows of the selected columns
+#head(df_selected)
+```
+
+```{r}
+library(scales)  # for percent formatting
+
+# Summarize the data by group (here using 'agegrp') and labour force status
+df_summary <- df %>%
+  group_by(agegrp, Retired) %>%
+  summarize(count = n()) %>%
+  ungroup()
+
+# Create a 100% stacked bar chart
+ggplot(df_summary, aes(x = factor(agegrp), y = count, fill = factor(Retired))) +
+  geom_bar(stat = "identity", position = "fill") +  # position = "fill" makes each bar 100%
+  scale_y_continuous(labels = percent_format()) +
+  labs(
+    x = "Age Group",
+    y = "Percentage of People",
+    fill = "Retired\n(1 = Yes)"
+  ) +
+  theme_minimal()
+
+```
+
+```{r}
+df_summary <- df %>%
+  group_by(agegrp) %>%
+  summarize(
+    n = n(),
+    retired_count = sum(Retired),
+    not_retired_count = n() - sum(Retired)
+  )
+```
+
+```{r}
+# Suppose df_summary is sorted by agegrp in ascending order
+# Find the rows corresponding to agegrp = 16 and 17
+grp16 <- df_summary %>% filter(agegrp == 16)
+grp17 <- df_summary %>% filter(agegrp == 17)
+
+prop.test(
+  x = c(grp16$retired_count, grp17$retired_count),   # number of "successes" (retired)
+  n = c(grp16$n, grp17$n)                           # total individuals in each group
+)
+
+```
+
+
+
+After the data cleaning process now we need to run the regression. First let's run regression basically between the presense of kids and the retirement status:
+
+```{r}
+# Model 1: Bivariate Regression
+# Examining the raw association between having kids (pkids) and being retired.
+
+model1 <- lm(Retired ~ pkids, data = df)
+summary(model1)
+```
+
+```{r}
+# Model 2: Regression with 3 Covariates
+# Here we include Age Group, Gender, and Total income of economic family for all persons.
+
+model2 <- lm(Retired ~ pkids + agegrp + Gender + EFInc, data = df)
+summary(model2)
+```
+
+```{r}
+model2_2 <- lm(Retired ~ pkids + agegrp + cqppb + EFInc, data = df)
+summary (model2_2)
+```
+
+```{r}
+model2_2 <- lm(Retired ~ pkids + CfSize + agegrp + cqppb + EFInc + pkids:CfSize, data = df)
+summary (model2_2)
+```
+
+
+
+
+```{r}
+# Model 3: Regression with 6 Covariates
+# In addition to the three above, we add Education: Highest certificate, diploma or degree, total kids, and Income: Canada Pension Plan (CPP) and Quebec Pension Plan.
+df <- df %>%
+  mutate(
+    total_kids = PKID0_1 + PKID2_5 + PKID6_14 + PKID15_24 + PKID25
+  )
+
+model3 <- lm(Retired ~ pkids + agegrp + Gender + EFInc + hdgree + total_kids + cqppb, data = df)
+summary(model3)
+
+```
+
+```{r}
+stargazer(
+  model1,
+  model2,
+  model2_2,
+  model3,
+  type = "text",
+  star.cutoffs = c(0.1, 0.05, 0.01, 0.001),      # 4 cutoffs
+  star.char    = c(".", "*", "**", "***"),      # Matching symbols
+  notes        = "Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1",
+  notes.append = FALSE
+)
+```
+```{r}
+# Load necessary libraries
+library(broom)
+
+# Extract regression results into a tidy format
+tidy_model1 <- tidy(model1) %>% mutate(Model = "Model 1")
+tidy_model2 <- tidy(model2) %>% mutate(Model = "Model 2")
+tidy_model2_2 <- tidy(model2_2) %>% mutate(Model = "Model 2_2")
+tidy_model3 <- tidy(model3) %>% mutate(Model = "Model 3")
+
+# Combine all model results
+all_models <- bind_rows(tidy_model1, tidy_model2, tidy_model2_2, tidy_model3)
+
+# Filter out the intercept (we don't usually plot it)
+all_models <- all_models %>% filter(term != "(Intercept)")
+
+# Plot coefficient estimates
+ggplot(all_models, aes(x = estimate, y = term, color = Model)) +
+  geom_point(size = 3) +
+  geom_errorbarh(aes(xmin = estimate - 1.96 * std.error, 
+                     xmax = estimate + 1.96 * std.error), height = 0.2) +
+  facet_wrap(~ Model) +
+  theme_minimal() +
+  labs(title = "Coefficient Plot: Retirement Status and Covariates",
+       x = "Coefficient Estimate",
+       y = "Covariates") +
+  theme(legend.position = "bottom")
+
+```
+
+### (b) Conditions for Causal Interpretation
+
+For the estimates in each of our regressions to be interpreted causally—specifically, to infer that having children (`pkids`) causes a change in retirement status (`Retired`)—the following assumption of **strict exogeneity** must hold:
+
+**Strict Exogeneity Assumption:**  
+The regression error term must have zero conditional expectation given the explanatory variables included in the model:
+
+\[
+E(\epsilon_i \mid \text{pkids}_i, X_i) = 0
+\]
+
+Practically, this means:
+
+- **No omitted variable bias:** All variables correlated both with having children (`pkids`) and retirement status (`Retired`) must be included in the model. If omitted variables remain, the strict exogeneity condition is violated.
+- **No reverse causality:** Retirement status does not causally influence whether a family has children. Practically, this assumption is plausible here, as retirement typically occurs later in life, after childbearing decisions have already been made.
+
+Thus, our causal interpretation requires believing that the included covariates (such as age, gender, household income, education level, family size, etc.) effectively control for all potential confounding factors, ensuring that:
+
+\[
+E(\varepsilon_i | \text{pkids}_i, X_i) = 0
+\]
+
+---
+
+### (c) Implications for Omitted Variable Bias (OVB)
+
+Comparing the coefficients for `pkids` across our three regression models, we have:
+
+- **Model 1** (no covariates):  
+  \[
+  \text{pkids coefficient} = -0.234
+  \]
+
+- **Model 2** (adding age group, gender, and income):  
+  \[
+  \text{pkids coefficient} = -0.151
+  \]
+
+- **Model 3** (adding education, total kids, and pension income):  
+  \[
+  \text{pkids coefficient} = -0.040
+  \]
+
+We observe that as we include more covariates, the magnitude of the coefficient on `pkids` consistently decreases (from `-0.234` to `-0.151`, then to `-0.040`). This pattern suggests that the simpler models significantly **overstated** the magnitude of the negative relationship between having children and retirement due to **omitted variable bias (OVB)**. Model2_2 specificlly tested the case for including the pention plan total income in the second model, and interestingly, the magnitute of coefficient for pkids increased. I guess this is shwoing that OVB can actually affect the magnitute of the coefficient in either way? 
+
+Specifically, the inclusion of critical covariates such as age, gender, household income, education level, and pension income substantially reduces the estimated effect, indicating that these variables were important omitted confounders in the simpler models.
+
+However, with more covariates included, the R^2 kept increase; this is quite reasonable as with more covariate included, more parts of the total variance of retirement can be explained.
+
+In conclusion, our analysis indicates substantial omitted variable bias in the simplest model, emphasizing the importance of controlling for comprehensive demographic and economic covariates to obtain a more accurate estimate of the true relationship.
+
+---

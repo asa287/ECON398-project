@@ -1,0 +1,237 @@
+---
+title: "Final Project Data Processing"
+output:
+  html_document:
+    df_print: paged
+---
+
+Load Library and reading the sample data:
+```{r}
+library(tidyverse)
+library(haven)
+library(stargazer)
+
+df <- read_dta("cen_ind_2021_pumf_v2.dta")
+head(df)
+```
+
+```{r}
+data1 <- df |> 
+  mutate(agegrp = as.numeric(agegrp)) |>
+  filter(agegrp>=17 & agegrp!=88)
+```
+
+
+
+## Data Filtering & Rationail
+
+We start by excluding cases where `pkids` or `lfact` are not available or not applicable. Then we create a binary `Retired` variable based on `lfact` codes 11, 12, and 13.
+
+```{r}
+df <- df %>%
+  # 1) Exclude PKIDS = 8 or 9 (not available / not applicable)
+  filter(agegrp %in% c(13, 14, 15, 16, 17, 18, 19, 20, 21)) %>%
+  
+  # 2) Exclude LFACT = 88 or 99 (not available / not applicable)
+  filter(!lfact %in% c(14, 88, 99)) %>%
+  
+  # 3) Define Retired = 1 if LFACT is 11, 12, or 13, else 0
+  mutate(
+    Retired = if_else(lfact %in% c(11, 12, 13), 1, 0)
+  )
+
+#table(df$pkids, useNA = "ifany")       # Should show only 0 or 1 now
+#table(df$lfact, useNA = "ifany")       # No 88 or 99
+#table(df$Retired, useNA = "ifany")     # Distribution of your new retired indicator
+
+#df_selected <- df %>%
+  select(pkids, lfact, Retired)
+
+# Print the first few rows of the selected columns
+#head(df_selected)
+```
+
+```{r}
+library(scales)  # for percent formatting
+
+# Summarize the data by group (here using 'agegrp') and labour force status
+df_summary <- df %>%
+  group_by(agegrp, Retired) %>%
+  summarize(count = n()) %>%
+  ungroup()
+
+# Create a 100% stacked bar chart
+ggplot(df_summary, aes(x = factor(agegrp), y = count, fill = factor(Retired))) +
+  geom_bar(stat = "identity", position = "fill") +  # position = "fill" makes each bar 100%
+  scale_y_continuous(labels = percent_format()) +
+  labs(
+    x = "Age Group",
+    y = "Percentage of People",
+    fill = "Retired\n(1 = Yes)"
+  ) +
+  theme_minimal()
+
+```
+
+```{r}
+df_summary <- df %>%
+  group_by(agegrp) %>%
+  summarize(
+    n = n(),
+    retired_count = sum(Retired),
+    not_retired_count = n() - sum(Retired)
+  )
+```
+
+```{r}
+# Suppose df_summary is sorted by agegrp in ascending order
+# Find the rows corresponding to agegrp = 16 and 17
+grp16 <- df_summary %>% filter(agegrp == 16)
+grp17 <- df_summary %>% filter(agegrp == 17)
+
+prop.test(
+  x = c(grp16$retired_count, grp17$retired_count),   # number of "successes" (retired)
+  n = c(grp16$n, grp17$n)                           # total individuals in each group
+)
+
+```
+
+
+
+Below is a well‐structured project outline incorporating your ideas. I've also added a few suggestions to strengthen your analysis.
+
+---
+
+# Project Outline: The Impact of OAS Eligibility on Retirement
+
+## I. Introduction
+
+- **Overview:**  
+  - Briefly describe Canada’s three‐pillar retirement system with emphasis on OAS (the foundational benefit) and CPP (the work-related benefit).
+  - State the motivation: to estimate the causal impact of OAS eligibility on retirement behavior (measured as labour force participation), while accounting for “pollution” from CPP and other income sources.
+
+
+- **Research Focus:**  
+  - Primary focus on OAS eligibility using the age-65 threshold.
+  - Secondary analysis on how contamination from CPP and differential immigrant eligibility might affect the results.
+
+
+## II. Research Questions
+
+- **Main Question:**  
+  - “What is the causal effect of OAS eligibility (triggered at age 65) on retirement behavior among Canadians aged 55 to 74?”
+
+- **Subgroup/Extension Questions:**  
+  - “How does the effect of OAS eligibility differ between domestic Canadians and immigrants, especially when immigrants’ eligibility depends on their age at arrival?”
+  - “How correlated are CPP receipt and OAS eligibility, and how might CPP or other income sources influence observed retirement patterns?”
+
+
+## III. Data and Sample Construction
+
+- **Data Source:**  
+  - 2021 Canadian Census.
+
+- **Sample Restrictions:**  
+  - **Age Range:** Focus on individuals aged 55–74 (corresponding to age groups: 15: 55–59, 16: 60–64, 17: 65–69, 18: 70–74).
+  - **Labour Force Information:** Exclude those who have never worked or did not report a labour force status.
+  - **Immigration Status:**  
+    - Exclude non-permanent residents or those with missing immigration status.
+    - Construct subgroups based on immigration age:
+      - **Group A:** Immigrants who arrived before age 55 (more likely to be eligible for OAS).
+      - **Group B:** Recent immigrants (who are generally ineligible for OAS due to insufficient residency).
+      - **SPECIFICALLY:** the immigrants can be separated into 2 groups: e.g., when looking at age group 55-59, there are two ways to set the control group. 
+      1. Strict: Set those who within the agegrp of 55-59 to immigrate only in immage 50-54, so the longest year they would stay in Canada is 9 years, but less sample may be available; 
+      2. Fuzzy: Set IMMAGE to 45-54, where the longest year they would stay in Canada is 14 years, but will have relatively more sample included. We are going to run our model on both of them.
+
+
+## IV. Treatment, Control, and Identification Strategy
+
+- **Treatment Definition:**  
+  - **Primary Treatment:** Eligibility for OAS, which is assigned at age 65 for individuals who have lived in Canada for at least 10 years.
+  - **Verification Steps:**  
+    - Test whether there is a clear cutoff—confirm that no one below age 65 receives OAS.
+    - Check if all Canadian-born individuals above 65 are indeed eligible.
+
+- **Control Groups for DID Analysis:**  
+  - **Within Age Groups:**  
+    - Use pre-eligibility age groups (55–59 and 60–64; i.e., agegrp 15 & 16) to establish a baseline common trend.
+    - Compare with post-eligibility groups (65–69 and 70–74; i.e., agegrp 17 & 18).
+  - **By Immigration Status:**  
+    - Compare domestic Canadians (and immigrants who arrived early) as the treatment group to recent immigrants (those immigrating later, with AGEIMM group ≥ 12) who are not eligible.
+
+- **Identification Strategy:**  
+  - Employ a Difference-in-Differences (DID) framework:
+    - **Assumption:** The common trend assumption holds over a narrow age range. Here, the pre-treatment trend (observed in age groups 15 and 16) provides the counterfactual for what would have happened in the absence of OAS eligibility.
+    - **Addressing “Pollution”:** Include covariates such as CPP receipt and other demographic factors to mitigate potential confounding from alternative income sources.
+
+
+## V. Common Trends Assumption
+
+- **Testing Common Trends:**  
+  - Use age groups 15 (55–59) and 16 (60–64) to check if pre-treatment trends in labor force participation are similar. The common trend will simply be the slope of the line connecting agegrp of 55~59 & 60~64.
+  - **IMPORTANT** Here we actually can extend our CTA by looking at other early immigrants who are not eligible (i.e., not have stayed in Canada for 10 years, for those who are currently 45-54 and immigrated within 10 years) to more generally test the CTA, but we have to note here that these people who are not eligible for OAS now will be eligible for OAS in the future, which may embed some bias in the CTA of our current analysis. This may make us need to adjust the previous agegrp that we were focusing on a bit.
+
+- **Discussion:**  
+  - Explain how the narrow age range minimizes potential differences in unobserved characteristics.
+  - Discuss limitations of a single-year (2021) cross-sectional dataset and how careful subgroup selection (especially among immigrants) can bolster the assumption.
+  
+  
+## VI. Empirical Models and Analysis Plan
+
+- **Model 1 – Main DID Analysis:**
+  - **Specification:**  
+    - Compare labour force participation before and after the age-65 cutoff.
+    - Model includes age-group dummies, treatment indicator (OAS eligibility), and interaction terms.
+
+  - **Key Parameter:**  
+    - The DID coefficient estimating the jump in retirement (or drop in labour force participation) at age 65.
+
+
+- **Model 2 – Subgroup Analysis by Immigration Status:**
+  - **Purpose:**  
+    - To compare outcomes between domestic Canadians (and immigrants who arrived early) and recent immigrants.
+  - **Specification:**  
+    - Same DID framework but run separately (or include interaction terms with immigration status) to test if the OAS effect is stronger among those eligible.
+
+- **Additional Analysis:**
+  - Investigate the correlation between CPP and OAS receipt.
+  - Include additional demographic covariates (gender, education, income, etc.) to control for confounding factors.
+
+
+## VII. Robustness Checks and Extensions
+
+- **Robustness Checks:**
+  - Vary the age range definitions slightly to test sensitivity.
+  - Test alternative specifications (e.g., regression analysis with additional covariates, or logistic versus linear probability models).
+
+- **Extensions:**
+  - Explore an instrumental variable approach: find an instrument that isolates the exogenous variation in OAS receipt. Specifically, here we are looking at a more specific group of people: the compliers, who will change their behavior due to the policy. This can be relatively easy to calculate if we use the result of DD (the **intend to treatment**) and divide it by the first stage.
+  - Analyze additional outcomes related to retirement quality or financial well-being.
+
+## VIII. Expected Contributions and Limitations
+- **Contributions:**
+  - Provide causal evidence on the impact of OAS eligibility on retirement decisions using a quasi-experimental design.
+  - Offer insights into how immigrant status and the timing of immigration affect eligibility and retirement behavior.
+- **Limitations:**
+  - Use of cross-sectional data from a single year limits the ability to observe long-term trends.
+  - Potential residual confounding from other pension systems (CPP, private savings) that must be carefully addressed in the analysis.
+
+## IX. Conclusion
+- **Summary:**  
+  - Recap the project’s objectives, the identification strategy using DID, and the role of different subgroups.
+- **Policy Implications:**  
+  - Discuss how findings might inform public policy regarding retirement benefits and pension reforms in Canada.
+- **Next Steps:**  
+  - Outline further research avenues or potential data improvements for future studies.
+
+---
+
+### Final Comments
+
+- **Detail the Data Cleaning Process:** Clearly outline how you will handle missing data and verify the OAS cutoff.
+- **Clarify Variable Construction:** Explicitly define your outcome (e.g., “Not in Labour Force” indicator), treatment, and covariates.
+- **Consider Graphical Evidence:** In addition to DID estimates, visualizing trends across age groups (e.g., with 100% stacked bar charts or RD plots) can bolster your common trends assumption.
+
+This outline should provide a strong roadmap for your project while remaining flexible enough to incorporate additional insights as you proceed.
+
+---

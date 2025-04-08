@@ -1,0 +1,137 @@
+---
+title: "Assignment 2 R code"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+Load Library and reading the sample data:
+```{r}
+library(tidyverse)
+library(haven)
+
+df <- read_dta("cen_ind_2021_pumf_v2.dta")
+head(df)
+```
+
+## Rationale for Data Filtering
+
+1. **Excluding Individuals under Age 15**  
+   We first remove all individuals with `agegrp < 6`. According to the Census PUMF documentation, `agegrp` takes integer codes corresponding to age brackets in five-year increments. An `agegrp` value of `6` corresponds to individuals aged 15–17. Since anyone under 15 is typically not in the labor force (and is “not applicable” for wage analyses), we exclude them to focus on the working-age population.
+
+2. **Removing Age Group 88**  
+   The code `88` in `agegrp` indicates “Not available” or otherwise missing data for age. Because age is crucial for our analysis—and individuals with `agegrp == 88` cannot be meaningfully placed into a standard age bracket—we remove them to avoid spurious or incomplete observations.
+
+3. **Filtering out Wages == 99999999**  
+   Next, we remove rows where `Wages` equals `99999999`. The user guide indicates that `99999999` is a placeholder for missing or “not applicable” wage data (e.g., individuals who did not report any wages). Since we are interested in actual wage values, these rows must be excluded.
+
+4. **Excluding Education Codes 5, 8, 9**  
+   The variable `attsch` represents education categories. By instruction, codes `5` (multiple responses), `8` (not available), and `9` (not applicable) are excluded from our sample. We want to focus on individuals with a single, valid education code—especially code `4` (university) versus the other valid non-university codes.
+
+5. **Creating a Binary ‘University’ Variable**  
+   Finally, we create a new indicator `univ` to label individuals who hold a university-level education. Specifically, `attsch == 4` (the code for university education) is assigned a value of `1`, while all other included education codes are assigned `0`. This binary variable simplifies comparisons of wages between “university” and “non-university” groups.
+
+
+```{r}
+df_filtered <- df %>%
+  filter(
+    agegrp >= 6,                           # keep agegrp >= 6
+    agegrp != 88,                         # remove agegrp == 88
+    !Wages %in% c(99999999, 88888888),    # remove these "not applicable" wage codes
+    !attsch %in% c(5, 8, 9)               # exclude multiple / not available / not applicable
+  ) %>%
+  mutate(
+    univ = if_else(attsch == 4, 1, 0)      # create binary var: 1 if university, else 0
+  )
+```
+
+
+## Comparing Wages by Education
+1. **Descriptive Statistics**
+A simple way to see if wages differ between university vs. non-university groups is to compare means:
+
+```{r}
+df_filtered %>%
+  group_by(univ) %>%
+  summarize(
+    count = n(),
+    mean_wage = mean(Wages, na.rm = TRUE),
+    median_wage = median(Wages, na.rm = TRUE),
+    sd_wage = sd(Wages, na.rm = TRUE)
+  )
+```
+We can see here there is a surprising effect that people with university degree actually having lower mean wage. Let's try to investigate where the problem is.
+
+
+2. **Visualization**
+Visualize the distribution of wages for each group:
+
+```{r}
+ggplot(df_filtered, aes(x = factor(univ), y = Wages, fill = factor(univ))) +
+  geom_boxplot() +
+  scale_fill_discrete(name = "University", labels = c("No", "Yes")) +
+  scale_x_discrete(labels = c("Non-University", "University")) +
+  labs(title = "Boxplot of Wages by University Status",
+       x = "Education Group",
+       y = "Wages") +
+  theme_minimal()
+```
+
+Interpretation:
+We can see here that there is a lot of outliers in the higher wage side for the group of people without university degree. This makes me think of that a lot of people with university degree might be those who are younger. Lets try to see if there is selection bias existing in the age covariance. 
+
+
+## Checking for Selection Bias (Failure of Balancing)
+Selection bias arises if the two groups (university vs. non-university) differ in characteristics that also affect wages.
+
+**Compare Age Distributions**
+We can compare the (coded) age group or an approximate numeric age measure. For demonstration, we’ll just compare the average agegrp code:
+
+```{r}
+df_filtered %>%
+  group_by(univ) %>%
+  summarize(
+    mean_agegrp = mean(agegrp, na.rm = TRUE),
+    n = n()
+  )
+```
+
+From above we can see that the mean of the two groups varies largely; most people having university degree has a mean of 8.8, within the rage of 20-24 years old; while people without university degree has mean age group of 12.2, within the rage of 40-44 years old. Plotting a histogram of the university and non-university groups in all age groups to show clearer evidence:
+
+```{r}
+ggplot(df_filtered, aes(x = factor(agegrp), fill = factor(univ))) +
+  geom_bar(position = "identity", alpha = 0.5) +
+  scale_fill_discrete(name = "University", labels = c("No", "Yes")) +
+  labs(
+    title = "Age Distribution by University Group",
+    x = "Age Group Code",
+    y = "Count"
+  ) +
+  theme_minimal()
+
+
+```
+
+From the distribution we can see that B1 is already violated since not all age group are presented by the two groups.
+
+```{r}
+ggplot(df_filtered, aes(x = Wages, fill = factor(univ))) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 30) +
+  scale_fill_discrete(name = "University", labels = c("No", "Yes")) +
+  labs(
+    title = "Histogram of Wages by University Group",
+    x = "Wages",
+    y = "Count"
+  ) +
+  theme_minimal()
+
+```
+With the box plot and the relatively much smaller sample of same wages we can also see that B2 is violated.
+
+We can clearly see that age is a covariance that is not controlled which could cause very high bias in B3. So there is selection bias highly attributable to a failure of balancing.
+
+
+
+
+
+
+
