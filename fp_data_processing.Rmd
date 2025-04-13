@@ -10,15 +10,91 @@ Load Library and reading the sample data:
 library(tidyverse)
 library(haven)
 library(stargazer)
+library(ggplot2)
 
-df <- read_dta("cen_ind_2021_pumf_v2.dta")
+df <- read_dta("data/cen_ind_2021_pumf_v2.dta")
 head(df)
 ```
 
+filter out basic variables (Di and Yi, excluding additional covariates) used for analysis at the moment
 ```{r}
-data1 <- df |> 
+# basic model only with di and yi related variables
+df_basic_d_y <- df |>
+  select(agegrp, lfact, ageimm,Citizen)
+
+head(df_basic_d_y)
+```
+
+exclude some inapplicable individuals:
+- individuals who have never worked & missing values in lfact (-14,-88,-99)
+- neither citizens nor immigrants 
+- those not aged in the interval we are interested in (beyond 55<age>74)
+```{r}
+# df without useless columns (at the moment)
+df_d_y_del <- df_basic_d_y |>
+  mutate(lfact = as.numeric(lfact)) |>
+  filter(lfact!=14 & lfact!=88 & lfact!=99) |>
+  mutate(ageimm = as.numeric(ageimm),
+         Citizen = as.numeric(Citizen)) |>
+  filter(ageimm!=88 & ageimm!=99 | Citizen==1) |>
   mutate(agegrp = as.numeric(agegrp)) |>
-  filter(agegrp>=17 & agegrp!=88)
+  filter(agegrp>=15 & agegrp<=19)
+```
+
+rewrite the outcome variable Yi
+```{r}
+# df with dummy Yi
+df_d_y_dumy <- df_d_y_del |>
+  mutate(retire=ifelse(lfact>=11 & lfact<=13, 1,0)) 
+```
+
+subgroup of citizen (where, if agegrp>16 => treated)
+```{r}
+#subset of citizens
+df_dy_citizen <- df_d_y_dumy |> 
+  filter(Citizen==1) |>
+  mutate(treatment=ifelse(agegrp>16,1,0))
+```
+
+subgroup of immigrants (strict) (where, if agegrp>16   &  ageimm<55 => treated)
+```{r}
+#subset of immigrants
+df_dy_immg <- df_d_y_dumy |> 
+  filter(ageimm!=99) |>
+  mutate(treatment=ifelse(agegrp>16   &  ageimm<55,1,0)) |>
+  mutate(Citizen=0)
+```
+
+combine the two subsets to one dataset
+```{r}
+# one dataset for both citizens and immigrants
+df_dy_comb <- rbind(df_dy_citizen, df_dy_immg)
+```
+
+proportion of retirement
+```{r}
+# dataset of retirement prop (grouped by age and citizenship)
+df_dy_comb_grouped <- df_dy_comb|>
+    group_by(agegrp,Citizen) |>
+    summarise(prop_retire=mean(retire))
+```
+plot the trends over time
+```{r}
+ggplot(df_dy_comb_grouped, aes(x = agegrp, y = prop_retire, color = factor(Citizen))) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(
+    title = "Retirement Proportion by Age Group",
+    x = "Age Group",
+    y = "Proportion Retired",
+    color = "Citizen Status"
+  ) +
+  scale_color_manual(
+    labels = c("Immigrant", "Citizen"),
+    values = c("blue", "red")
+  ) +
+  theme_minimal()
+
 ```
 
 
