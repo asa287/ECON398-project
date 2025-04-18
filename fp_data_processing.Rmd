@@ -12,7 +12,7 @@ library(haven)
 library(stargazer)
 library(ggplot2)
 
-df <- read_dta("data/cen_ind_2021_pumf_v2.dta")
+df <- read_csv("data/data_donnees_2021_ind_v2.csv")
 head(df)
 ```
 
@@ -20,7 +20,12 @@ filter out basic variables (Di and Yi, excluding additional covariates) used for
 ```{r}
 # basic model only with di and yi related variables
 df_basic_d_y <- df |>
-  select(agegrp, lfact, ageimm,Citizen)
+  select(AGEGRP, LFACT, AGEIMM, Citizen) |>
+  rename(
+    agegrp = AGEGRP,
+    lfact = LFACT,
+    ageimm = AGEIMM
+  )
 
 head(df_basic_d_y)
 ```
@@ -61,7 +66,8 @@ subgroup of immigrants (strict) (where, if agegrp>16   &  ageimm<55 => treated)
 #subset of immigrants
 df_dy_immg <- df_d_y_dumy |> 
   filter(ageimm!=99) |>
-  mutate(treatment=ifelse(agegrp>16   &  ageimm<55,1,0)) |>
+  filter((ageimm>=12&agegrp>16) | agegrp<=16) |>
+  mutate(treatment=0) |>
   mutate(Citizen=0)
 ```
 
@@ -71,6 +77,13 @@ combine the two subsets to one dataset
 df_dy_comb <- rbind(df_dy_citizen, df_dy_immg)
 ```
 
+filter out the treated immigrants after age>65
+```{r}
+#
+df_dy_comb_no_treated_immg <- df_dy_comb |>
+  filter(!(Citizen == 0 & treatment == 1))
+```
+
 proportion of retirement
 ```{r}
 # dataset of retirement prop (grouped by age and citizenship)
@@ -78,6 +91,7 @@ df_dy_comb_grouped <- df_dy_comb|>
     group_by(agegrp,Citizen) |>
     summarise(prop_retire=mean(retire))
 ```
+
 plot the trends over time
 ```{r}
 ggplot(df_dy_comb_grouped, aes(x = agegrp, y = prop_retire, color = factor(Citizen))) +
