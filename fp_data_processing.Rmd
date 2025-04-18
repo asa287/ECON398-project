@@ -20,53 +20,53 @@ filter out basic variables (Di and Yi, excluding additional covariates) used for
 ```{r}
 # basic model only with di and yi related variables
 df_basic_d_y <- df |>
-  select(AGEGRP, LFACT, AGEIMM, Citizen) |>
-  rename(
-    agegrp = AGEGRP,
-    lfact = LFACT,
-    ageimm = AGEIMM
-  )
+  select(AGEGRP, LFACT, AGEIMM, Citizen, YRIM, IMMSTAT)
 
 head(df_basic_d_y)
+library(readr)
+
+# write to a file called “df_basic_d_y.csv” in your working directory
+write_csv(df_basic_d_y, "cen_2021_clean.csv")
+
 ```
 
 exclude some inapplicable individuals:
-- individuals who have never worked & missing values in lfact (-14,-88,-99)
+- individuals who have never worked & missing values in LFACT (-14,-88,-99)
 - neither citizens nor immigrants 
 - those not aged in the interval we are interested in (beyond 55<age>74)
 ```{r}
 # df without useless columns (at the moment)
 df_d_y_del <- df_basic_d_y |>
-  mutate(lfact = as.numeric(lfact)) |>
-  filter(lfact!=14 & lfact!=88 & lfact!=99) |>
-  mutate(ageimm = as.numeric(ageimm),
+  mutate(LFACT = as.numeric(LFACT)) |>
+  filter(LFACT!=14 & LFACT!=88 & LFACT!=99) |>
+  mutate(AGEIMM = as.numeric(AGEIMM),
          Citizen = as.numeric(Citizen)) |>
-  filter(ageimm!=88 & ageimm!=99 | Citizen==1) |>
-  mutate(agegrp = as.numeric(agegrp)) |>
-  filter(agegrp>=15 & agegrp<=19)
+  filter(AGEIMM!=88 & AGEIMM!=99 | Citizen==1) |>
+  mutate(AGEGRP = as.numeric(AGEGRP)) |>
+  filter(AGEGRP>=15 & AGEGRP<=19)
 ```
 
 rewrite the outcome variable Yi
 ```{r}
 # df with dummy Yi
 df_d_y_dumy <- df_d_y_del |>
-  mutate(retire=ifelse(lfact>=11 & lfact<=13, 1,0)) 
+  mutate(retire=ifelse(LFACT>=11 & LFACT<=13, 1,0)) 
 ```
 
-subgroup of citizen (where, if agegrp>16 => treated)
+subgroup of citizen (where, if AGEGRP>16 => treated)
 ```{r}
 #subset of citizens
 df_dy_citizen <- df_d_y_dumy |> 
   filter(Citizen==1) |>
-  mutate(treatment=ifelse(agegrp>16,1,0))
+  mutate(treatment=ifelse(AGEGRP>16,1,0))
 ```
 
-subgroup of immigrants (strict) (where, if agegrp>16   &  ageimm<55 => treated)
+subgroup of immigrants (strict) (where, if AGEGRP>16   &  AGEIMM<55 => treated)
 ```{r}
 #subset of immigrants
 df_dy_immg <- df_d_y_dumy |> 
-  filter(ageimm!=99) |>
-  filter((ageimm>=12&agegrp>16) | agegrp<=16) |>
+  filter(AGEIMM!=99) |>
+  filter((AGEIMM>=12&AGEGRP>16) | AGEGRP<=16) |>
   mutate(treatment=0) |>
   mutate(Citizen=0)
 ```
@@ -88,13 +88,13 @@ proportion of retirement
 ```{r}
 # dataset of retirement prop (grouped by age and citizenship)
 df_dy_comb_grouped <- df_dy_comb|>
-    group_by(agegrp,Citizen) |>
+    group_by(AGEGRP,Citizen) |>
     summarise(prop_retire=mean(retire))
 ```
 
 plot the trends over time
 ```{r}
-ggplot(df_dy_comb_grouped, aes(x = agegrp, y = prop_retire, color = factor(Citizen))) +
+ggplot(df_dy_comb_grouped, aes(x = AGEGRP, y = prop_retire, color = factor(Citizen))) +
   geom_line(size = 1.2) +
   geom_point(size = 2) +
   labs(
@@ -115,27 +115,27 @@ ggplot(df_dy_comb_grouped, aes(x = agegrp, y = prop_retire, color = factor(Citiz
 
 ## Data Filtering & Rationail
 
-We start by excluding cases where `pkids` or `lfact` are not available or not applicable. Then we create a binary `Retired` variable based on `lfact` codes 11, 12, and 13.
+We start by excluding cases where `pkids` or `LFACT` are not available or not applicable. Then we create a binary `Retired` variable based on `LFACT` codes 11, 12, and 13.
 
 ```{r}
 df <- df %>%
   # 1) Exclude PKIDS = 8 or 9 (not available / not applicable)
-  filter(agegrp %in% c(13, 14, 15, 16, 17, 18, 19, 20, 21)) %>%
+  filter(AGEGRP %in% c(13, 14, 15, 16, 17, 18, 19, 20, 21)) %>%
   
   # 2) Exclude LFACT = 88 or 99 (not available / not applicable)
-  filter(!lfact %in% c(14, 88, 99)) %>%
+  filter(!LFACT %in% c(14, 88, 99)) %>%
   
   # 3) Define Retired = 1 if LFACT is 11, 12, or 13, else 0
   mutate(
-    Retired = if_else(lfact %in% c(11, 12, 13), 1, 0)
+    Retired = if_else(LFACT %in% c(11, 12, 13), 1, 0)
   )
 
 #table(df$pkids, useNA = "ifany")       # Should show only 0 or 1 now
-#table(df$lfact, useNA = "ifany")       # No 88 or 99
+#table(df$LFACT, useNA = "ifany")       # No 88 or 99
 #table(df$Retired, useNA = "ifany")     # Distribution of your new retired indicator
 
 #df_selected <- df %>%
-  select(pkids, lfact, Retired)
+  select(pkids, LFACT, Retired)
 
 # Print the first few rows of the selected columns
 #head(df_selected)
@@ -144,14 +144,14 @@ df <- df %>%
 ```{r}
 library(scales)  # for percent formatting
 
-# Summarize the data by group (here using 'agegrp') and labour force status
+# Summarize the data by group (here using 'AGEGRP') and labour force status
 df_summary <- df %>%
-  group_by(agegrp, Retired) %>%
+  group_by(AGEGRP, Retired) %>%
   summarize(count = n()) %>%
   ungroup()
 
 # Create a 100% stacked bar chart
-ggplot(df_summary, aes(x = factor(agegrp), y = count, fill = factor(Retired))) +
+ggplot(df_summary, aes(x = factor(AGEGRP), y = count, fill = factor(Retired))) +
   geom_bar(stat = "identity", position = "fill") +  # position = "fill" makes each bar 100%
   scale_y_continuous(labels = percent_format()) +
   labs(
@@ -165,7 +165,7 @@ ggplot(df_summary, aes(x = factor(agegrp), y = count, fill = factor(Retired))) +
 
 ```{r}
 df_summary <- df %>%
-  group_by(agegrp) %>%
+  group_by(AGEGRP) %>%
   summarize(
     n = n(),
     retired_count = sum(Retired),
@@ -174,10 +174,10 @@ df_summary <- df %>%
 ```
 
 ```{r}
-# Suppose df_summary is sorted by agegrp in ascending order
-# Find the rows corresponding to agegrp = 16 and 17
-grp16 <- df_summary %>% filter(agegrp == 16)
-grp17 <- df_summary %>% filter(agegrp == 17)
+# Suppose df_summary is sorted by AGEGRP in ascending order
+# Find the rows corresponding to AGEGRP = 16 and 17
+grp16 <- df_summary %>% filter(AGEGRP == 16)
+grp17 <- df_summary %>% filter(AGEGRP == 17)
 
 prop.test(
   x = c(grp16$retired_count, grp17$retired_count),   # number of "successes" (retired)
@@ -230,7 +230,7 @@ Below is a well‐structured project outline incorporating your ideas. I've also
       - **Group A:** Immigrants who arrived before age 55 (more likely to be eligible for OAS).
       - **Group B:** Recent immigrants (who are generally ineligible for OAS due to insufficient residency).
       - **SPECIFICALLY:** the immigrants can be separated into 2 groups: e.g., when looking at age group 55-59, there are two ways to set the control group. 
-      1. Strict: Set those who within the agegrp of 55-59 to immigrate only in immage 50-54, so the longest year they would stay in Canada is 9 years, but less sample may be available; 
+      1. Strict: Set those who within the AGEGRP of 55-59 to immigrate only in immage 50-54, so the longest year they would stay in Canada is 9 years, but less sample may be available; 
       2. Fuzzy: Set IMMAGE to 45-54, where the longest year they would stay in Canada is 14 years, but will have relatively more sample included. We are going to run our model on both of them.
 
 
@@ -244,8 +244,8 @@ Below is a well‐structured project outline incorporating your ideas. I've also
 
 - **Control Groups for DID Analysis:**  
   - **Within Age Groups:**  
-    - Use pre-eligibility age groups (55–59 and 60–64; i.e., agegrp 15 & 16) to establish a baseline common trend.
-    - Compare with post-eligibility groups (65–69 and 70–74; i.e., agegrp 17 & 18).
+    - Use pre-eligibility age groups (55–59 and 60–64; i.e., AGEGRP 15 & 16) to establish a baseline common trend.
+    - Compare with post-eligibility groups (65–69 and 70–74; i.e., AGEGRP 17 & 18).
   - **By Immigration Status:**  
     - Compare domestic Canadians (and immigrants who arrived early) as the treatment group to recent immigrants (those immigrating later, with AGEIMM group ≥ 12) who are not eligible.
 
@@ -258,8 +258,8 @@ Below is a well‐structured project outline incorporating your ideas. I've also
 ## V. Common Trends Assumption
 
 - **Testing Common Trends:**  
-  - Use age groups 15 (55–59) and 16 (60–64) to check if pre-treatment trends in labor force participation are similar. The common trend will simply be the slope of the line connecting agegrp of 55~59 & 60~64.
-  - **IMPORTANT** Here we actually can extend our CTA by looking at other early immigrants who are not eligible (i.e., not have stayed in Canada for 10 years, for those who are currently 45-54 and immigrated within 10 years) to more generally test the CTA, but we have to note here that these people who are not eligible for OAS now will be eligible for OAS in the future, which may embed some bias in the CTA of our current analysis. This may make us need to adjust the previous agegrp that we were focusing on a bit.
+  - Use age groups 15 (55–59) and 16 (60–64) to check if pre-treatment trends in labor force participation are similar. The common trend will simply be the slope of the line connecting AGEGRP of 55~59 & 60~64.
+  - **IMPORTANT** Here we actually can extend our CTA by looking at other early immigrants who are not eligible (i.e., not have stayed in Canada for 10 years, for those who are currently 45-54 and immigrated within 10 years) to more generally test the CTA, but we have to note here that these people who are not eligible for OAS now will be eligible for OAS in the future, which may embed some bias in the CTA of our current analysis. This may make us need to adjust the previous AGEGRP that we were focusing on a bit.
 
 - **Discussion:**  
   - Explain how the narrow age range minimizes potential differences in unobserved characteristics.
