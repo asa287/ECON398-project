@@ -5,77 +5,110 @@ output:
     df_print: paged
 ---
 
-Load Library and reading the sample data:
+Load Library and reading the cleaned census data, where we only included 6 columns: AGEGRP: age (in groups); LFACT: labor force detail; AGEIMM: age at immigration; Citizen: Citizenship; YRIM: year of Immigration; IMMSTAT: immigrant status. These are the main columns that we will be performing our analysis on and try to explore the causal relatioinship. 
 ```{r}
+rm(list=ls())
+
 library(tidyverse)
 library(haven)
 library(stargazer)
 library(ggplot2)
+library(dplyr)
 
-df <- read_csv("data/data_donnees_2021_ind_v2.csv")
+df <- read_csv("data/cen_2021_clean.csv")
 head(df)
 ```
 
-filter out basic variables (Di and Yi, excluding additional covariates) used for analysis at the moment
-```{r}
-# basic model only with di and yi related variables
-df_basic_d_y <- df |>
-  select(AGEGRP, LFACT, AGEIMM, Citizen, YRIM, IMMSTAT)
+Data cleaning Process:
+1) coerce all the PUMF code‐vars to numeric in one go
+2) drop the “never worked” & missing codes in LFACT
+3) keep only citizens or immigrants
+4) restrict to the age groups you care about (AGEGRP 13–19)
+5) create the Retired outcome variable (Yi)
 
-head(df_basic_d_y)
-library(readr)
 
-# write to a file called “df_basic_d_y.csv” in your working directory
-write_csv(df_basic_d_y, "cen_2021_clean.csv")
 
-```
-
-exclude some inapplicable individuals:
-- individuals who have never worked & missing values in LFACT (-14,-88,-99)
-- neither citizens nor immigrants 
-- those not aged in the interval we are interested in (beyond 55<age>74)
+- individuals who have never worked & missing values in LFACT (all the code bigger than and including 14)
+- neither citizens nor immigrants (IMMSTAT here we only need code = 1&2)
+- those not aged in the interval we are interested in (beyond 49<age>74, so agegrp from 13~19)
 ```{r}
 # df without useless columns (at the moment)
-df_d_y_del <- df_basic_d_y |>
-  mutate(LFACT = as.numeric(LFACT)) |>
-  filter(LFACT!=14 & LFACT!=88 & LFACT!=99) |>
-  mutate(AGEIMM = as.numeric(AGEIMM),
-         Citizen = as.numeric(Citizen)) |>
-  filter(AGEIMM!=88 & AGEIMM!=99 | Citizen==1) |>
-  mutate(AGEGRP = as.numeric(AGEGRP)) |>
-  filter(AGEGRP>=15 & AGEGRP<=19)
+df_clean <- df %>%
+  mutate(across(
+    c(AGEGRP, LFACT, IMMSTAT, YRIM),
+    ~ as.numeric(.)
+  )) %>%
+  
+  filter(! LFACT %in% c(14, 88, 99)) %>%
+  
+  filter(IMMSTAT %in% c(1, 2)) %>%
+  
+  filter(AGEGRP >= 13, AGEGRP <= 19) %>%
+  
+  mutate(
+    Retired = if_else(LFACT %in% c(11, 12, 13), 1L, 0L)
+  )
+head(df_clean)
 ```
 
-rewrite the outcome variable Yi
+# Quick check:
 ```{r}
-# df with dummy Yi
-df_d_y_dumy <- df_d_y_del |>
-  mutate(retire=ifelse(LFACT>=11 & LFACT<=13, 1,0)) 
+df_clean %>% 
+  count(LFACT)     # should only see 1–13
+df_clean %>% 
+  count(IMMSTAT)   # only 1,2
+df_clean %>% 
+  count(AGEGRP)    # only 13–19
+df_clean %>% 
+  count(Retired)   # retired vs. not
+```
+Separating treatment/ control group
+
+```{r}
+df_did <- df_clean %>%
+  # define group membership once and for all
+  mutate(
+    eligible = as.integer(
+      IMMSTAT == 1                          # all citizens
+      | (IMMSTAT == 2 & YRIM <= 2011)      # immigrants ≥10 yrs
+    ),
+    post = as.integer(AGEGRP > 16),        # age 65+ if AGEGRP 17+
+    did  = eligible * post                 # the actual treatment
+  )
 ```
 
-subgroup of citizen (where, if AGEGRP>16 => treated)
 ```{r}
-#subset of citizens
-df_dy_citizen <- df_d_y_dumy |> 
-  filter(Citizen==1) |>
-  mutate(treatment=ifelse(AGEGRP>16,1,0))
+# 2. Summarise retirement rates by age and group
+df_trends <- df_did %>%
+  group_by(AGEGRP, eligible) %>%
+  summarise(
+    prop_retire = mean(Retired),
+    .groups = "drop"
+  )
+
 ```
 
-subgroup of immigrants (strict) (where, if AGEGRP>16   &  AGEIMM<55 => treated)
 ```{r}
-#subset of immigrants
-df_dy_immg <- df_d_y_dumy |> 
-  filter(AGEIMM!=99) |>
-  filter((AGEIMM>=12&AGEGRP>16) | AGEGRP<=16) |>
-  mutate(treatment=0) |>
-  mutate(Citizen=0)
+ggplot(df_trends, aes(x = AGEGRP, y = prop_retire, color = factor(eligible))) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 16.8, linetype = "dashed", color = "grey50") +
+  scale_color_manual(
+    values = c("blue", "red"),
+    labels = c("Ineligible (control)", "Eligible (treatment)"),
+    name   = "OAS Eligibility"
+  ) +
+  scale_x_continuous(breaks = 13:19) +
+  labs(
+    title    = "Retirement Rates by Age Group and OAS Eligibility",
+    subtitle = "Full series (13–16 = pre-trend; jump at 17=65)",
+    x        = "AGEGRP (13=50–54, …, 17=65–69, …)",
+    y        = "Proportion Retired"
+  ) +
+  theme_minimal()
 ```
 
-combine the two subsets to one dataset
-```{r}
-# one dataset for both citizens and immigrants
-df_dy_comb <- rbind(df_dy_citizen, df_dy_immg)
-```
+
 
 filter out the treated immigrants after age>65
 ```{r}
@@ -89,7 +122,7 @@ proportion of retirement
 # dataset of retirement prop (grouped by age and citizenship)
 df_dy_comb_grouped <- df_dy_comb|>
     group_by(AGEGRP,Citizen) |>
-    summarise(prop_retire=mean(retire))
+    summarise(prop_retire=mean(Retired))
 ```
 
 plot the trends over time

@@ -1,0 +1,78 @@
+---
+title: "Previous Codes"
+author: "Mike Zhao"
+date: "2025-04-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+Filter out basic variables (Di and Yi, excluding additional covariates) used for analysis at the moment and create a csv file. 
+```{r}
+# basic model only with di and yi related variables
+df_basic_d_y <- df |>
+  select(AGEGRP, LFACT, AGEIMM, Citizen, YRIM, IMMSTAT)
+
+head(df_basic_d_y)
+library(readr)
+
+# write to a file called “df_basic_d_y.csv” in your working directory
+write_csv(df_basic_d_y, "cen_2021_clean.csv")
+
+```
+
+
+subgroup of citizen (where, if AGEGRP>16 => treated)
+```{r}
+#subset of citizens
+df_dy_citizen <- df_clean |> 
+  filter(IMMSTAT==1) |>
+  mutate(treatment=ifelse(AGEGRP>16,1,0))
+```
+
+subgroup of immigrants (where, if YRIM<2011 => treated)
+```{r}
+#subset of immigrants
+df_dy_immg <- df_clean |> 
+  filter(IMMSTAT==2) |>
+  filter((YRIM>2011&AGEGRP>16) | AGEGRP<=16) |>
+  mutate(treatment=0) |>
+  mutate(Citizen=0)
+```
+
+combine the two subsets to one dataset
+```{r}
+# one dataset for both citizens and immigrants
+df_dy_comb <- rbind(df_dy_citizen, df_dy_immg)
+```
+
+
+
+
+
+
+
+
+
