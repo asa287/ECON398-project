@@ -108,6 +108,53 @@ ggplot(df_trends, aes(x = AGEGRP, y = prop_retire, color = factor(eligible))) +
   theme_minimal()
 ```
 
+immigrant only: compare between treatment immigrants and control immigrants
+
+```{r}
+df_imm_only <- df_clean %>%
+  # get rid of citizen
+  filter(
+    IMMSTAT == 2
+  ) %>%
+  # define group membership once and for all
+  mutate(
+    eligible = as.integer(YRIM <= 2011     # immigrants ≥10 yrs
+    ),
+    post = as.integer(AGEGRP > 16),        # age 65+ if AGEGRP 17+
+    did  = eligible * post                 # the actual treatment
+  )
+```
+
+```{r}
+# 2. Summarise retirement rates by age and group
+df_trends_imm <- df_imm_only %>%
+  group_by(AGEGRP, eligible) %>%
+  summarise(
+    prop_retire = mean(Retired),
+    .groups = "drop"
+  )
+```
+
+```{r}
+ggplot(df_trends_imm, aes(x = AGEGRP, y = prop_retire, color = factor(eligible))) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 16.8, linetype = "dashed", color = "grey50") +
+  scale_color_manual(
+    values = c("blue", "red"),
+    labels = c("Ineligible (control)", "Eligible (treatment)"),
+    name   = "OAS Eligibility"
+  ) +
+  scale_x_continuous(breaks = 13:19) +
+  labs(
+    title    = "Retirement Rates by Age Group and OAS Eligibility",
+    subtitle = "Full series (13–16 = pre-trend; jump at 17=65)",
+    x        = "AGEGRP (13=50–54, …, 17=65–69, …)",
+    y        = "Proportion Retired"
+  ) +
+  theme_minimal()
+```
+
 
 
 filter out the treated immigrants after age>65
