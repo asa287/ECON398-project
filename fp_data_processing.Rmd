@@ -1,6 +1,7 @@
 ---
 title: "Final Project Data Processing"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -154,6 +155,37 @@ ggplot(df_trends_imm, aes(x = AGEGRP, y = prop_retire, color = factor(eligible))
   ) +
   theme_minimal()
 ```
+
+
+## Regression models
+
+1. baseline (addictive) model for citizen-immigrant dataset:
+```{r}
+lm_baseline_c_i <- lm(Retired~ post + eligible, data=df_did)
+
+summary(lm_baseline_c_i)
+```
+
+2. did model for citizen-immigrant dataset:
+```{r}
+lm_did_c_i <- lm(Retired~ post * eligible, data=df_did)
+
+summary(lm_did_c_i)
+```
+3. baseline (addictive) model for immigrant-only sample:
+```{r}
+lm_baseline_i <- lm(Retired~ post + eligible, data=df_imm_only)
+
+summary(lm_baseline_i)
+```
+2. did model for immigrant-only sample:
+```{r}
+lm_did_i <- lm(Retired~ post * eligible, data=df_imm_only)
+
+summary(lm_did_i)
+```
+
+
 
 
 
