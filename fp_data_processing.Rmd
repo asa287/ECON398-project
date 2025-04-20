@@ -166,24 +166,38 @@ lm_baseline_c_i <- lm(Retired~ post + eligible, data=df_did)
 summary(lm_baseline_c_i)
 ```
 
-2. did model for citizen-immigrant dataset:
+2.1 did linear probability model for citizen-immigrant dataset:
 ```{r}
 lm_did_c_i <- lm(Retired~ post * eligible, data=df_did)
 
 summary(lm_did_c_i)
 ```
+2.2 did logistic model for citizen-immigrant dataset:
+```{r}
+logm_did_c_i <- glm(Retired~ post * eligible, data=df_did, family=binomial)
+
+summary(logm_did_c_i)
+```
+
 3. baseline (addictive) model for immigrant-only sample:
 ```{r}
 lm_baseline_i <- lm(Retired~ post + eligible, data=df_imm_only)
 
 summary(lm_baseline_i)
 ```
-2. did model for immigrant-only sample:
+4.1 did linear probability model for immigrant-only sample:
 ```{r}
 lm_did_i <- lm(Retired~ post * eligible, data=df_imm_only)
 
 summary(lm_did_i)
 ```
+4.2 did logistic model for immigrant-only sample:
+```{r}
+logm_did_i <- glm(Retired~ post * eligible, data=df_imm_only, family=binomial)
+
+summary(logm_did_i)
+```
+
 
 
 
