@@ -6,7 +6,7 @@ output:
   pdf_document: default
 ---
 
-Load Library and reading the cleaned census data, where we only included 6 columns: AGEGRP: age (in groups); LFACT: labor force detail; AGEIMM: age at immigration; Citizen: Citizenship; YRIM: year of Immigration; IMMSTAT: immigrant status. These are the main columns that we will be performing our analysis on and try to explore the causal relatioinship. 
+Load Library and reading the cleaned census data, where we only included 4 columns: AGEGRP: age (in groups); LFACT: labor force detail; YRIM: year of Immigration; IMMSTAT: immigrant status. These are the main columns that we will be performing our analysis on and try to explore the causal relationship. 
 ```{r}
 rm(list=ls())
 
@@ -16,6 +16,17 @@ library(stargazer)
 library(ggplot2)
 library(dplyr)
 
+#Data Subsetting (previous preparatory work, commented out here)
+#df_basic_d_y <- df |>
+  #select(AGEGRP, LFACT, YRIM, IMMSTAT)
+
+#head(df_basic_d_y)
+#library(readr)
+
+# write to a file called “df_basic_d_y.csv” in your working directory
+#write_csv(df_basic_d_y, "cen_2021_clean.csv")
+
+#Read in the cleaned dataset:
 df <- read_csv("data/cen_2021_clean.csv")
 head(df)
 ```
@@ -27,11 +38,6 @@ Data cleaning Process:
 4) restrict to the age groups you care about (AGEGRP 13–19)
 5) create the Retired outcome variable (Yi)
 
-
-
-- individuals who have never worked & missing values in LFACT (all the code bigger than and including 14)
-- neither citizens nor immigrants (IMMSTAT here we only need code = 1&2)
-- those not aged in the interval we are interested in (beyond 49<age>74, so agegrp from 13~19)
 ```{r}
 # df without useless columns (at the moment)
 df_clean <- df %>%
@@ -64,9 +70,7 @@ df_clean %>%
   count(Retired)   # retired vs. not
 ```
 
-
 Separating treatment/ control group
-
 ```{r}
 df_did <- df_clean %>%
   # define group membership once and for all
@@ -85,8 +89,6 @@ summary statistics
 summary(df_did)
 ```
 
-
-
 ```{r}
 # 2. Summarise retirement rates by age and group
 df_trends <- df_did %>%
@@ -99,6 +101,7 @@ df_trends <- df_did %>%
 ```
 
 ```{r}
+#Chat-GPT helped with the plotting partially
 ggplot(df_trends, aes(x = AGEGRP, y = prop_retire, color = factor(eligible))) +
   geom_line(size = 1) +
   geom_point(size = 2) +
@@ -129,9 +132,7 @@ summary(ct_fac)
 
 ```
 
-
 immigrant only: compare between treatment immigrants and control immigrants
-
 ```{r}
 df_imm_only <- df_clean %>%
   # get rid of citizen
@@ -151,7 +152,6 @@ df_imm_only <- df_clean %>%
 summary(df_imm_only)
 ```
 
-
 ```{r}
 # 2. Summarise retirement rates by age and group
 df_trends_imm <- df_imm_only %>%
@@ -163,6 +163,7 @@ df_trends_imm <- df_imm_only %>%
 ```
 
 ```{r}
+#Chat-GPT helped with the plotting partially
 ggplot(df_trends_imm, aes(x = AGEGRP, y = prop_retire, color = factor(eligible))) +
   geom_line(size = 1) +
   geom_point(size = 2) +
@@ -190,7 +191,6 @@ pre_df_imm <- df_imm_only %>%
 ct_fac <- lm(Retired ~ eligible * factor(AGEGRP), data = pre_df_imm)
 summary(ct_fac)
 ```
-
 
 ## Regression models
 
@@ -234,8 +234,7 @@ summary(logm_did_i)
 ```
 Citizen–Immigrant Models
 ```{r}
-library(stargazer)
-
+#Code generated under help of Chat-GPT
 stargazer(
   lm_baseline_c_i, lm_did_c_i, logm_did_c_i,
   type = "html",
@@ -255,10 +254,9 @@ stargazer(
 
 ```
 
-
-
  Immigrant-Only Models
 ```{r}
+#Code generated under help of Chat-GPT
 stargazer(
   lm_baseline_i, lm_did_i, logm_did_i,
   type = "html",
@@ -277,4 +275,3 @@ stargazer(
 
 
 ```
-
