@@ -1,0 +1,1212 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Final Project Data Processing},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Final Project Data Processing}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+Load Library and reading the cleaned census data, where we only included
+6 columns: AGEGRP: age (in groups); LFACT: labor force detail; AGEIMM:
+age at immigration; Citizen: Citizenship; YRIM: year of Immigration;
+IMMSTAT: immigrant status. These are the main columns that we will be
+performing our analysis on and try to explore the causal relatioinship.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{rm}\NormalTok{(}\AttributeTok{list=}\FunctionTok{ls}\NormalTok{())}
+
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+## v dplyr     1.1.4     v readr     2.1.5
+## v forcats   1.0.0     v stringr   1.5.1
+## v ggplot2   3.5.0     v tibble    3.2.1
+## v lubridate 1.9.3     v tidyr     1.3.1
+## v purrr     1.0.2     
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(haven)}
+\FunctionTok{library}\NormalTok{(stargazer)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Please cite as: 
+## 
+##  Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+##  R package version 5.2.3. https://CRAN.R-project.org/package=stargazer
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"data/cen\_2021\_clean.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 980868 Columns: 4
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## dbl (4): AGEGRP, LFACT, YRIM, IMMSTAT
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 4
+##   AGEGRP LFACT  YRIM IMMSTAT
+##    <dbl> <dbl> <dbl>   <dbl>
+## 1     13    88  2008      88
+## 2     11     3  2005       2
+## 3     13    14  9999       1
+## 4     16    13  9999       1
+## 5     18    13  9999       1
+## 6     16    13  9999       1
+\end{verbatim}
+
+Data cleaning Process: 1) coerce all the PUMF code‐vars to numeric in
+one go 2) drop the ``never worked'' \& missing codes in LFACT 3) keep
+only citizens or immigrants 4) restrict to the age groups you care about
+(AGEGRP 13--19) 5) create the Retired outcome variable (Yi)
+
+\begin{itemize}
+\tightlist
+\item
+  individuals who have never worked \& missing values in LFACT (all the
+  code bigger than and including 14)
+\item
+  neither citizens nor immigrants (IMMSTAT here we only need code =
+  1\&2)
+\item
+  those not aged in the interval we are interested in (beyond 4974, so
+  agegrp from 13\textasciitilde19)
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# df without useless columns (at the moment)}
+\NormalTok{df\_clean }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\FunctionTok{across}\NormalTok{(}
+    \FunctionTok{c}\NormalTok{(AGEGRP, LFACT, IMMSTAT, YRIM),}
+    \SpecialCharTok{\textasciitilde{}} \FunctionTok{as.numeric}\NormalTok{(.)}
+\NormalTok{  )) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\NormalTok{ LFACT }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\DecValTok{14}\NormalTok{, }\DecValTok{88}\NormalTok{, }\DecValTok{99}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{filter}\NormalTok{(IMMSTAT }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{filter}\NormalTok{(AGEGRP }\SpecialCharTok{\textgreater{}=} \DecValTok{13}\NormalTok{, AGEGRP }\SpecialCharTok{\textless{}=} \DecValTok{19}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{Retired =} \FunctionTok{if\_else}\NormalTok{(LFACT }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\DecValTok{11}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{13}\NormalTok{), }\DecValTok{1}\DataTypeTok{L}\NormalTok{, }\DecValTok{0}\DataTypeTok{L}\NormalTok{)}
+\NormalTok{  )}
+\FunctionTok{head}\NormalTok{(df\_clean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 5
+##   AGEGRP LFACT  YRIM IMMSTAT Retired
+##    <dbl> <dbl> <dbl>   <dbl>   <int>
+## 1     16    13  9999       1       1
+## 2     18    13  9999       1       1
+## 3     16    13  9999       1       1
+## 4     16    13     9       2       1
+## 5     16    13  9999       1       1
+## 6     13     1  9999       1       0
+\end{verbatim}
+
+\section{Quick check:}\label{quick-check}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_clean }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(LFACT)     }\CommentTok{\# should only see 1–13}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 13 x 2
+##    LFACT      n
+##    <dbl>  <int>
+##  1     1 192662
+##  2     2   9486
+##  3     3   4816
+##  4     4   3782
+##  5     5    929
+##  6     6   1316
+##  7     7    616
+##  8     8    204
+##  9     9   6251
+## 10    10   2159
+## 11    11  10642
+## 12    12  11850
+## 13    13 131197
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_clean }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(IMMSTAT)   }\CommentTok{\# only 1,2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   IMMSTAT      n
+##     <dbl>  <int>
+## 1       1 270777
+## 2       2 105133
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_clean }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(AGEGRP)    }\CommentTok{\# only 13–19}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 7 x 2
+##   AGEGRP     n
+##    <dbl> <int>
+## 1     13 58613
+## 2     14 60607
+## 3     15 68034
+## 4     16 64749
+## 5     17 53613
+## 6     18 42635
+## 7     19 27659
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_clean }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(Retired)   }\CommentTok{\# retired vs. not}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   Retired      n
+##     <int>  <int>
+## 1       0 222221
+## 2       1 153689
+\end{verbatim}
+
+Separating treatment/ control group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_did }\OtherTok{\textless{}{-}}\NormalTok{ df\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \CommentTok{\# define group membership once and for all}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{eligible =} \FunctionTok{as.integer}\NormalTok{(}
+\NormalTok{      IMMSTAT }\SpecialCharTok{==} \DecValTok{1}                          \CommentTok{\# all citizens}
+      \SpecialCharTok{|}\NormalTok{ (IMMSTAT }\SpecialCharTok{==} \DecValTok{2} \SpecialCharTok{\&}\NormalTok{ YRIM }\SpecialCharTok{\textless{}=} \DecValTok{2011}\NormalTok{)      }\CommentTok{\# immigrants ≥10 yrs}
+\NormalTok{    ),}
+    \AttributeTok{post =} \FunctionTok{as.integer}\NormalTok{(AGEGRP }\SpecialCharTok{\textgreater{}} \DecValTok{16}\NormalTok{),        }\CommentTok{\# age 65+ if AGEGRP 17+}
+    \AttributeTok{did  =}\NormalTok{ eligible }\SpecialCharTok{*}\NormalTok{ post                 }\CommentTok{\# the actual treatment}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+summary statistics
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df\_did)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      AGEGRP          LFACT             YRIM         IMMSTAT    
+##  Min.   :13.00   Min.   : 1.000   Min.   :   1   Min.   :1.00  
+##  1st Qu.:14.00   1st Qu.: 1.000   1st Qu.:2011   1st Qu.:1.00  
+##  Median :16.00   Median : 1.000   Median :9999   Median :1.00  
+##  Mean   :15.62   Mean   : 6.125   Mean   :7453   Mean   :1.28  
+##  3rd Qu.:17.00   3rd Qu.:13.000   3rd Qu.:9999   3rd Qu.:2.00  
+##  Max.   :19.00   Max.   :13.000   Max.   :9999   Max.   :2.00  
+##     Retired          eligible           post             did        
+##  Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.:0.0000   1st Qu.:1.0000   1st Qu.:0.0000   1st Qu.:0.0000  
+##  Median :0.0000   Median :1.0000   Median :0.0000   Median :0.0000  
+##  Mean   :0.4088   Mean   :0.9731   Mean   :0.3296   Mean   :0.3253  
+##  3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+##  Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 2. Summarise retirement rates by age and group}
+\NormalTok{df\_trends }\OtherTok{\textless{}{-}}\NormalTok{ df\_did }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(AGEGRP, eligible) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{prop\_retire =} \FunctionTok{mean}\NormalTok{(Retired),}
+    \AttributeTok{.groups =} \StringTok{"drop"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df\_trends, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ AGEGRP, }\AttributeTok{y =}\NormalTok{ prop\_retire, }\AttributeTok{color =} \FunctionTok{factor}\NormalTok{(eligible))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{size =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{16.8}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{color =} \StringTok{"grey50"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_manual}\NormalTok{(}
+    \AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{),}
+    \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Ineligible (control)"}\NormalTok{, }\StringTok{"Eligible (treatment)"}\NormalTok{),}
+    \AttributeTok{name   =} \StringTok{"OAS Eligibility"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =} \DecValTok{13}\SpecialCharTok{:}\DecValTok{19}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Retirement Rates by Age Group and OAS Eligibility"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Full series (13–16 = pre{-}trend; jump at 17=65)"}\NormalTok{,}
+    \AttributeTok{x        =} \StringTok{"AGEGRP (13=50–54, …, 17=65–69, …)"}\NormalTok{,}
+    \AttributeTok{y        =} \StringTok{"Proportion Retired"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## i Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+\end{verbatim}
+
+\includegraphics{fp_data_processing_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+immigrant only: compare between treatment immigrants and control
+immigrants
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_imm\_only }\OtherTok{\textless{}{-}}\NormalTok{ df\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \CommentTok{\# get rid of citizen}
+  \FunctionTok{filter}\NormalTok{(}
+\NormalTok{    IMMSTAT }\SpecialCharTok{==} \DecValTok{2}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \CommentTok{\# define group membership once and for all}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{eligible =} \FunctionTok{as.integer}\NormalTok{(YRIM }\SpecialCharTok{\textless{}=} \DecValTok{2011}     \CommentTok{\# immigrants ≥10 yrs}
+\NormalTok{    ),}
+    \AttributeTok{post =} \FunctionTok{as.integer}\NormalTok{(AGEGRP }\SpecialCharTok{\textgreater{}} \DecValTok{16}\NormalTok{),        }\CommentTok{\# age 65+ if AGEGRP 17+}
+    \AttributeTok{did  =}\NormalTok{ eligible }\SpecialCharTok{*}\NormalTok{ post                 }\CommentTok{\# the actual treatment}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 2. Summarise retirement rates by age and group}
+\NormalTok{df\_trends\_imm }\OtherTok{\textless{}{-}}\NormalTok{ df\_imm\_only }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(AGEGRP, eligible) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{prop\_retire =} \FunctionTok{mean}\NormalTok{(Retired),}
+    \AttributeTok{.groups =} \StringTok{"drop"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df\_trends\_imm, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ AGEGRP, }\AttributeTok{y =}\NormalTok{ prop\_retire, }\AttributeTok{color =} \FunctionTok{factor}\NormalTok{(eligible))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{size =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{16.8}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{color =} \StringTok{"grey50"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_manual}\NormalTok{(}
+    \AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{),}
+    \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Ineligible (control)"}\NormalTok{, }\StringTok{"Eligible (treatment)"}\NormalTok{),}
+    \AttributeTok{name   =} \StringTok{"OAS Eligibility"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =} \DecValTok{13}\SpecialCharTok{:}\DecValTok{19}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title    =} \StringTok{"Retirement Rates by Age Group and OAS Eligibility"}\NormalTok{,}
+    \AttributeTok{subtitle =} \StringTok{"Full series (13–16 = pre{-}trend; jump at 17=65)"}\NormalTok{,}
+    \AttributeTok{x        =} \StringTok{"AGEGRP (13=50–54, …, 17=65–69, …)"}\NormalTok{,}
+    \AttributeTok{y        =} \StringTok{"Proportion Retired"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{fp_data_processing_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\subsection{Regression models}\label{regression-models}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  baseline (additive) model for citizen-immigrant dataset:
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm\_baseline\_c\_i }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Retired}\SpecialCharTok{\textasciitilde{}}\NormalTok{ post }\SpecialCharTok{+}\NormalTok{ eligible, }\AttributeTok{data=}\NormalTok{df\_did)}
+
+\FunctionTok{summary}\NormalTok{(lm\_baseline\_c\_i)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Retired ~ post + eligible, data = df_did)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7907 -0.2230 -0.2230  0.2093  0.8236 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 0.176353   0.004106   42.95   <2e-16 ***
+## post        0.567677   0.001434  395.88   <2e-16 ***
+## eligible    0.046631   0.004163   11.20   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4125 on 375907 degrees of freedom
+## Multiple R-squared:  0.2959, Adjusted R-squared:  0.2959 
+## F-statistic: 7.898e+04 on 2 and 375907 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+2.1 did linear probability model for citizen-immigrant dataset:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm\_did\_c\_i }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Retired}\SpecialCharTok{\textasciitilde{}}\NormalTok{ post }\SpecialCharTok{*}\NormalTok{ eligible, }\AttributeTok{data=}\NormalTok{df\_did)}
+
+\FunctionTok{summary}\NormalTok{(lm\_did\_c\_i)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Retired ~ post * eligible, data = df_did)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7907 -0.2230 -0.2230  0.2093  0.8231 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   0.176892   0.004472  39.552   <2e-16 ***
+## post          0.564306   0.011186  50.449   <2e-16 ***
+## eligible      0.046073   0.004550  10.126   <2e-16 ***
+## post:eligible 0.003428   0.011279   0.304    0.761    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4125 on 375906 degrees of freedom
+## Multiple R-squared:  0.2959, Adjusted R-squared:  0.2959 
+## F-statistic: 5.265e+04 on 3 and 375906 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+2.2 did logistic model for citizen-immigrant dataset:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{logm\_did\_c\_i }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(Retired}\SpecialCharTok{\textasciitilde{}}\NormalTok{ post }\SpecialCharTok{*}\NormalTok{ eligible, }\AttributeTok{data=}\NormalTok{df\_did, }\AttributeTok{family=}\NormalTok{binomial)}
+
+\FunctionTok{summary}\NormalTok{(logm\_did\_c\_i)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = Retired ~ post * eligible, family = binomial, data = df_did)
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   -1.53755    0.02841  -54.12   <2e-16 ***
+## post           2.58975    0.06346   40.81   <2e-16 ***
+## eligible       0.28908    0.02883   10.03   <2e-16 ***
+## post:eligible -0.01214    0.06403   -0.19     0.85    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 508558  on 375909  degrees of freedom
+## Residual deviance: 393681  on 375906  degrees of freedom
+## AIC: 393689
+## 
+## Number of Fisher Scoring iterations: 4
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  baseline (additive) model for immigrant-only sample:
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm\_baseline\_i }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Retired}\SpecialCharTok{\textasciitilde{}}\NormalTok{ post }\SpecialCharTok{+}\NormalTok{ eligible, }\AttributeTok{data=}\NormalTok{df\_imm\_only)}
+
+\FunctionTok{summary}\NormalTok{(lm\_baseline\_i)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Retired ~ post + eligible, data = df_imm_only)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7698 -0.1864 -0.1864  0.2302  0.8262 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 0.173846   0.003987    43.6   <2e-16 ***
+## post        0.583360   0.002664   218.9   <2e-16 ***
+## eligible    0.012588   0.004196     3.0   0.0027 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.399 on 105130 degrees of freedom
+## Multiple R-squared:  0.3164, Adjusted R-squared:  0.3164 
+## F-statistic: 2.433e+04 on 2 and 105130 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+4.1 did linear probability model for immigrant-only sample:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm\_did\_i }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Retired}\SpecialCharTok{\textasciitilde{}}\NormalTok{ post }\SpecialCharTok{*}\NormalTok{ eligible, }\AttributeTok{data=}\NormalTok{df\_imm\_only)}
+
+\FunctionTok{summary}\NormalTok{(lm\_did\_i)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Retired ~ post * eligible, data = df_imm_only)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.7706 -0.1860 -0.1860  0.2294  0.8231 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   0.176892   0.004325  40.896   <2e-16 ***
+## post          0.564306   0.010818  52.164   <2e-16 ***
+## eligible      0.009134   0.004606   1.983   0.0474 *  
+## post:eligible 0.020285   0.011162   1.817   0.0692 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.399 on 105129 degrees of freedom
+## Multiple R-squared:  0.3165, Adjusted R-squared:  0.3164 
+## F-statistic: 1.622e+04 on 3 and 105129 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+4.2 did logistic model for immigrant-only sample:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{logm\_did\_i }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(Retired}\SpecialCharTok{\textasciitilde{}}\NormalTok{ post }\SpecialCharTok{*}\NormalTok{ eligible, }\AttributeTok{data=}\NormalTok{df\_imm\_only, }\AttributeTok{family=}\NormalTok{binomial)}
+
+\FunctionTok{summary}\NormalTok{(logm\_did\_i)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = Retired ~ post * eligible, family = binomial, data = df_imm_only)
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   -1.53755    0.02841 -54.116   <2e-16 ***
+## post           2.58975    0.06346  40.809   <2e-16 ***
+## eligible       0.06151    0.03019   2.037   0.0416 *  
+## post:eligible  0.09809    0.06566   1.494   0.1352    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 138452  on 105132  degrees of freedom
+## Residual deviance: 104739  on 105129  degrees of freedom
+## AIC: 104747
+## 
+## Number of Fisher Scoring iterations: 4
+\end{verbatim}
+
+Citizen--Immigrant Models
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(stargazer)}
+
+\FunctionTok{stargazer}\NormalTok{(}
+\NormalTok{  lm\_baseline\_c\_i, lm\_did\_c\_i, logm\_did\_c\_i,}
+  \AttributeTok{type =} \StringTok{"html"}\NormalTok{,}
+  \AttributeTok{out =} \StringTok{"table\_citizen\_immigrant.html"}\NormalTok{,}
+  \AttributeTok{title =} \StringTok{"Citizen–Immigrant Models: Retirement Effects"}\NormalTok{,}
+  \AttributeTok{column.labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baseline"}\NormalTok{, }\StringTok{"DID (LPM)"}\NormalTok{, }\StringTok{"DID (Logit)"}\NormalTok{),}
+  \AttributeTok{covariate.labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Post"}\NormalTok{, }\StringTok{"Eligible"}\NormalTok{, }\StringTok{"Post × Eligible"}\NormalTok{),}
+  \AttributeTok{dep.var.labels =} \StringTok{"Retired"}\NormalTok{,}
+  \AttributeTok{omit.stat =} \FunctionTok{c}\NormalTok{(}\StringTok{"f"}\NormalTok{, }\StringTok{"ser"}\NormalTok{),   }\CommentTok{\# 忽略 F统计量 和 残差标准误}
+  \AttributeTok{report =} \StringTok{"vc*"}\NormalTok{,              }\CommentTok{\# 报告系数和显著性星号}
+  \AttributeTok{digits =} \DecValTok{3}\NormalTok{,                  }\CommentTok{\# 小数点后 3 位}
+  \AttributeTok{no.space =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{align =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{notes =} \StringTok{"Standard errors in parentheses. *** p\textless{}0.01, ** p\textless{}0.05, * p\textless{}0.1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## <table style="text-align:center"><caption><strong>Citizen–Immigrant Models: Retirement Effects</strong></caption>
+## <tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="3"><em>Dependent variable:</em></td></tr>
+## <tr><td></td><td colspan="3" style="border-bottom: 1px solid black"></td></tr>
+## <tr><td style="text-align:left"></td><td colspan="3">Retired</td></tr>
+## <tr><td style="text-align:left"></td><td colspan="2"><em>OLS</em></td><td><em>logistic</em></td></tr>
+## <tr><td style="text-align:left"></td><td>Baseline</td><td>DID (LPM)</td><td>DID (Logit)</td></tr>
+## <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td></tr>
+## <tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Post</td><td>0.568<sup>***</sup></td><td>0.564<sup>***</sup></td><td>2.590<sup>***</sup></td></tr>
+## <tr><td style="text-align:left">Eligible</td><td>0.047<sup>***</sup></td><td>0.046<sup>***</sup></td><td>0.289<sup>***</sup></td></tr>
+## <tr><td style="text-align:left">Post × Eligible</td><td></td><td>0.003</td><td>-0.012</td></tr>
+## <tr><td style="text-align:left">Constant</td><td>0.176<sup>***</sup></td><td>0.177<sup>***</sup></td><td>-1.538<sup>***</sup></td></tr>
+## <tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>375,910</td><td>375,910</td><td>375,910</td></tr>
+## <tr><td style="text-align:left">R<sup>2</sup></td><td>0.296</td><td>0.296</td><td></td></tr>
+## <tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.296</td><td>0.296</td><td></td></tr>
+## <tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td>-196,840.500</td></tr>
+## <tr><td style="text-align:left">Akaike Inf. Crit.</td><td></td><td></td><td>393,688.900</td></tr>
+## <tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="3" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
+## <tr><td style="text-align:left"></td><td colspan="3" style="text-align:right">Standard errors in parentheses. *** p<0.01, ** p<0.05, * p<0.1</td></tr>
+## </table>
+\end{verbatim}
+
+Immigrant-Only Models
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{stargazer}\NormalTok{(}
+\NormalTok{  lm\_baseline\_i, lm\_did\_i, logm\_did\_i,}
+  \AttributeTok{type =} \StringTok{"html"}\NormalTok{,}
+  \AttributeTok{out =} \StringTok{"table\_immigrant\_only.html"}\NormalTok{,}
+  \AttributeTok{title =} \StringTok{"Immigrant{-}Only Models: Retirement Effects"}\NormalTok{,}
+  \AttributeTok{column.labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baseline"}\NormalTok{, }\StringTok{"DID (LPM)"}\NormalTok{, }\StringTok{"DID (Logit)"}\NormalTok{),}
+  \AttributeTok{covariate.labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Post"}\NormalTok{, }\StringTok{"Eligible"}\NormalTok{, }\StringTok{"Post × Eligible"}\NormalTok{),}
+  \AttributeTok{dep.var.labels =} \StringTok{"Retired"}\NormalTok{,}
+  \AttributeTok{omit.stat =} \FunctionTok{c}\NormalTok{(}\StringTok{"f"}\NormalTok{, }\StringTok{"ser"}\NormalTok{),}
+  \AttributeTok{report =} \StringTok{"vc*"}\NormalTok{,}
+  \AttributeTok{digits =} \DecValTok{3}\NormalTok{,}
+  \AttributeTok{no.space =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{align =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{notes =} \StringTok{"Standard errors in parentheses. *** p\textless{}0.01, ** p\textless{}0.05, * p\textless{}0.1"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## <table style="text-align:center"><caption><strong>Immigrant-Only Models: Retirement Effects</strong></caption>
+## <tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="3"><em>Dependent variable:</em></td></tr>
+## <tr><td></td><td colspan="3" style="border-bottom: 1px solid black"></td></tr>
+## <tr><td style="text-align:left"></td><td colspan="3">Retired</td></tr>
+## <tr><td style="text-align:left"></td><td colspan="2"><em>OLS</em></td><td><em>logistic</em></td></tr>
+## <tr><td style="text-align:left"></td><td>Baseline</td><td>DID (LPM)</td><td>DID (Logit)</td></tr>
+## <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td></tr>
+## <tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Post</td><td>0.583<sup>***</sup></td><td>0.564<sup>***</sup></td><td>2.590<sup>***</sup></td></tr>
+## <tr><td style="text-align:left">Eligible</td><td>0.013<sup>***</sup></td><td>0.009<sup>**</sup></td><td>0.062<sup>**</sup></td></tr>
+## <tr><td style="text-align:left">Post × Eligible</td><td></td><td>0.020<sup>*</sup></td><td>0.098</td></tr>
+## <tr><td style="text-align:left">Constant</td><td>0.174<sup>***</sup></td><td>0.177<sup>***</sup></td><td>-1.538<sup>***</sup></td></tr>
+## <tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>105,133</td><td>105,133</td><td>105,133</td></tr>
+## <tr><td style="text-align:left">R<sup>2</sup></td><td>0.316</td><td>0.316</td><td></td></tr>
+## <tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.316</td><td>0.316</td><td></td></tr>
+## <tr><td style="text-align:left">Log Likelihood</td><td></td><td></td><td>-52,369.430</td></tr>
+## <tr><td style="text-align:left">Akaike Inf. Crit.</td><td></td><td></td><td>104,746.900</td></tr>
+## <tr><td colspan="4" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="3" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
+## <tr><td style="text-align:left"></td><td colspan="3" style="text-align:right">Standard errors in parentheses. *** p<0.01, ** p<0.05, * p<0.1</td></tr>
+## </table>
+\end{verbatim}
+
+Below is a well‐structured project outline incorporating your ideas.
+I've also added a few suggestions to strengthen your analysis.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\section{Project Outline: The Impact of OAS Eligibility on
+Retirement}\label{project-outline-the-impact-of-oas-eligibility-on-retirement}
+
+\subsection{I. Introduction}\label{i.-introduction}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Overview:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Briefly describe Canada's three‐pillar retirement system with
+    emphasis on OAS (the foundational benefit) and CPP (the work-related
+    benefit).
+  \item
+    State the motivation: to estimate the causal impact of OAS
+    eligibility on retirement behavior (measured as labour force
+    participation), while accounting for ``pollution'' from CPP and
+    other income sources.
+  \end{itemize}
+\item
+  \textbf{Research Focus:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Primary focus on OAS eligibility using the age-65 threshold.
+  \item
+    Secondary analysis on how contamination from CPP and differential
+    immigrant eligibility might affect the results.
+  \end{itemize}
+\end{itemize}
+
+\subsection{II. Research Questions}\label{ii.-research-questions}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Main Question:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ``What is the causal effect of OAS eligibility (triggered at age 65)
+    on retirement behavior among Canadians aged 55 to 74?''
+  \end{itemize}
+\item
+  \textbf{Subgroup/Extension Questions:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ``How does the effect of OAS eligibility differ between domestic
+    Canadians and immigrants, especially when immigrants' eligibility
+    depends on their age at arrival?''
+  \item
+    ``How correlated are CPP receipt and OAS eligibility, and how might
+    CPP or other income sources influence observed retirement
+    patterns?''
+  \end{itemize}
+\end{itemize}
+
+\subsection{III. Data and Sample
+Construction}\label{iii.-data-and-sample-construction}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Data Source:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    2021 Canadian Census.
+  \end{itemize}
+\item
+  \textbf{Sample Restrictions:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Age Range:} Focus on individuals aged 55--74 (corresponding
+    to age groups: 15: 55--59, 16: 60--64, 17: 65--69, 18: 70--74).
+  \item
+    \textbf{Labour Force Information:} Exclude those who have never
+    worked or did not report a labour force status.
+  \item
+    \textbf{Immigration Status:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Exclude non-permanent residents or those with missing immigration
+      status.
+    \item
+      Construct subgroups based on immigration age:
+
+      \begin{itemize}
+      \tightlist
+      \item
+        \textbf{Group A:} Immigrants who arrived before age 55 (more
+        likely to be eligible for OAS).
+      \item
+        \textbf{Group B:} Recent immigrants (who are generally
+        ineligible for OAS due to insufficient residency).
+      \item
+        \textbf{SPECIFICALLY:} the immigrants can be separated into 2
+        groups: e.g., when looking at age group 55-59, there are two
+        ways to set the control group.
+      \end{itemize}
+
+      \begin{enumerate}
+      \def\labelenumi{\arabic{enumi}.}
+      \tightlist
+      \item
+        Strict: Set those who within the AGEGRP of 55-59 to immigrate
+        only in immage 50-54, so the longest year they would stay in
+        Canada is 9 years, but less sample may be available;
+      \item
+        Fuzzy: Set IMMAGE to 45-54, where the longest year they would
+        stay in Canada is 14 years, but will have relatively more sample
+        included. We are going to run our model on both of them.
+      \end{enumerate}
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\subsection{IV. Treatment, Control, and Identification
+Strategy}\label{iv.-treatment-control-and-identification-strategy}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Treatment Definition:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Primary Treatment:} Eligibility for OAS, which is assigned
+    at age 65 for individuals who have lived in Canada for at least 10
+    years.
+  \item
+    \textbf{Verification Steps:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Test whether there is a clear cutoff---confirm that no one below
+      age 65 receives OAS.
+    \item
+      Check if all Canadian-born individuals above 65 are indeed
+      eligible.
+    \end{itemize}
+  \end{itemize}
+\item
+  \textbf{Control Groups for DID Analysis:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Within Age Groups:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Use pre-eligibility age groups (55--59 and 60--64; i.e., AGEGRP 15
+      \& 16) to establish a baseline common trend.
+    \item
+      Compare with post-eligibility groups (65--69 and 70--74; i.e.,
+      AGEGRP 17 \& 18).
+    \end{itemize}
+  \item
+    \textbf{By Immigration Status:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Compare domestic Canadians (and immigrants who arrived early) as
+      the treatment group to recent immigrants (those immigrating later,
+      with AGEIMM group ≥ 12) who are not eligible.
+    \end{itemize}
+  \end{itemize}
+\item
+  \textbf{Identification Strategy:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Employ a Difference-in-Differences (DID) framework:
+
+    \begin{itemize}
+    \tightlist
+    \item
+      \textbf{Assumption:} The common trend assumption holds over a
+      narrow age range. Here, the pre-treatment trend (observed in age
+      groups 15 and 16) provides the counterfactual for what would have
+      happened in the absence of OAS eligibility.
+    \item
+      \textbf{Addressing ``Pollution'':} Include covariates such as CPP
+      receipt and other demographic factors to mitigate potential
+      confounding from alternative income sources.
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\subsection{V. Common Trends
+Assumption}\label{v.-common-trends-assumption}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Testing Common Trends:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Use age groups 15 (55--59) and 16 (60--64) to check if pre-treatment
+    trends in labor force participation are similar. The common trend
+    will simply be the slope of the line connecting AGEGRP of
+    55\textasciitilde59 \& 60\textasciitilde64.
+  \item
+    \textbf{IMPORTANT} Here we actually can extend our CTA by looking at
+    other early immigrants who are not eligible (i.e., not have stayed
+    in Canada for 10 years, for those who are currently 45-54 and
+    immigrated within 10 years) to more generally test the CTA, but we
+    have to note here that these people who are not eligible for OAS now
+    will be eligible for OAS in the future, which may embed some bias in
+    the CTA of our current analysis. This may make us need to adjust the
+    previous AGEGRP that we were focusing on a bit.
+  \end{itemize}
+\item
+  \textbf{Discussion:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Explain how the narrow age range minimizes potential differences in
+    unobserved characteristics.
+  \item
+    Discuss limitations of a single-year (2021) cross-sectional dataset
+    and how careful subgroup selection (especially among immigrants) can
+    bolster the assumption.
+  \end{itemize}
+\end{itemize}
+
+\subsection{VI. Empirical Models and Analysis
+Plan}\label{vi.-empirical-models-and-analysis-plan}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Model 1 -- Main DID Analysis:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Specification:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Compare labour force participation before and after the age-65
+      cutoff.
+    \item
+      Model includes age-group dummies, treatment indicator (OAS
+      eligibility), and interaction terms.
+    \end{itemize}
+  \item
+    \textbf{Key Parameter:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      The DID coefficient estimating the jump in retirement (or drop in
+      labour force participation) at age 65.
+    \end{itemize}
+  \end{itemize}
+\item
+  \textbf{Model 2 -- Subgroup Analysis by Immigration Status:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Purpose:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      To compare outcomes between domestic Canadians (and immigrants who
+      arrived early) and recent immigrants.
+    \end{itemize}
+  \item
+    \textbf{Specification:}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Same DID framework but run separately (or include interaction
+      terms with immigration status) to test if the OAS effect is
+      stronger among those eligible.
+    \end{itemize}
+  \end{itemize}
+\item
+  \textbf{Additional Analysis:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Investigate the correlation between CPP and OAS receipt.
+  \item
+    Include additional demographic covariates (gender, education,
+    income, etc.) to control for confounding factors.
+  \end{itemize}
+\end{itemize}
+
+\subsection{VII. Robustness Checks and
+Extensions}\label{vii.-robustness-checks-and-extensions}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Robustness Checks:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Vary the age range definitions slightly to test sensitivity.
+  \item
+    Test alternative specifications (e.g., regression analysis with
+    additional covariates, or logistic versus linear probability
+    models).
+  \end{itemize}
+\item
+  \textbf{Extensions:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Explore an instrumental variable approach: find an instrument that
+    isolates the exogenous variation in OAS receipt. Specifically, here
+    we are looking at a more specific group of people: the compliers,
+    who will change their behavior due to the policy. This can be
+    relatively easy to calculate if we use the result of DD (the
+    \textbf{intend to treatment}) and divide it by the first stage.
+  \item
+    Analyze additional outcomes related to retirement quality or
+    financial well-being.
+  \end{itemize}
+\end{itemize}
+
+\subsection{VIII. Expected Contributions and
+Limitations}\label{viii.-expected-contributions-and-limitations}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Contributions:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Provide causal evidence on the impact of OAS eligibility on
+    retirement decisions using a quasi-experimental design.
+  \item
+    Offer insights into how immigrant status and the timing of
+    immigration affect eligibility and retirement behavior.
+  \end{itemize}
+\item
+  \textbf{Limitations:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Use of cross-sectional data from a single year limits the ability to
+    observe long-term trends.
+  \item
+    Potential residual confounding from other pension systems (CPP,
+    private savings) that must be carefully addressed in the analysis.
+  \end{itemize}
+\end{itemize}
+
+\subsection{IX. Conclusion}\label{ix.-conclusion}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Summary:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Recap the project's objectives, the identification strategy using
+    DID, and the role of different subgroups.
+  \end{itemize}
+\item
+  \textbf{Policy Implications:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Discuss how findings might inform public policy regarding retirement
+    benefits and pension reforms in Canada.
+  \end{itemize}
+\item
+  \textbf{Next Steps:}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Outline further research avenues or potential data improvements for
+    future studies.
+  \end{itemize}
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsubsection{Final Comments}\label{final-comments}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Detail the Data Cleaning Process:} Clearly outline how you
+  will handle missing data and verify the OAS cutoff.
+\item
+  \textbf{Clarify Variable Construction:} Explicitly define your outcome
+  (e.g., ``Not in Labour Force'' indicator), treatment, and covariates.
+\item
+  \textbf{Consider Graphical Evidence:} In addition to DID estimates,
+  visualizing trends across age groups (e.g., with 100\% stacked bar
+  charts or RD plots) can bolster your common trends assumption.
+\end{itemize}
+
+This outline should provide a strong roadmap for your project while
+remaining flexible enough to incorporate additional insights as you
+proceed.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\end{document}
