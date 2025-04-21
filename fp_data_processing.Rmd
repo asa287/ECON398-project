@@ -1,9 +1,9 @@
 ---
 title: "Final Project Data Processing"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 Load Library and reading the cleaned census data, where we only included 6 columns: AGEGRP: age (in groups); LFACT: labor force detail; AGEIMM: age at immigration; Citizen: Citizenship; YRIM: year of Immigration; IMMSTAT: immigrant status. These are the main columns that we will be performing our analysis on and try to explore the causal relatioinship. 
@@ -63,6 +63,8 @@ df_clean %>%
 df_clean %>% 
   count(Retired)   # retired vs. not
 ```
+
+
 Separating treatment/ control group
 
 ```{r}
@@ -77,6 +79,13 @@ df_did <- df_clean %>%
     did  = eligible * post                 # the actual treatment
   )
 ```
+
+summary statistics
+```{r}
+summary(df_did)
+```
+
+
 
 ```{r}
 # 2. Summarise retirement rates by age and group
@@ -127,6 +136,11 @@ df_imm_only <- df_clean %>%
 ```
 
 ```{r}
+summary(df_did)
+```
+
+
+```{r}
 # 2. Summarise retirement rates by age and group
 df_trends_imm <- df_imm_only %>%
   group_by(AGEGRP, eligible) %>%
@@ -159,7 +173,7 @@ ggplot(df_trends_imm, aes(x = AGEGRP, y = prop_retire, color = factor(eligible))
 
 ## Regression models
 
-1. baseline (addictive) model for citizen-immigrant dataset:
+1. baseline (additive) model for citizen-immigrant dataset:
 ```{r}
 lm_baseline_c_i <- lm(Retired~ post + eligible, data=df_did)
 
@@ -179,7 +193,7 @@ logm_did_c_i <- glm(Retired~ post * eligible, data=df_did, family=binomial)
 summary(logm_did_c_i)
 ```
 
-3. baseline (addictive) model for immigrant-only sample:
+3. baseline (additive) model for immigrant-only sample:
 ```{r}
 lm_baseline_i <- lm(Retired~ post + eligible, data=df_imm_only)
 
@@ -197,120 +211,55 @@ logm_did_i <- glm(Retired~ post * eligible, data=df_imm_only, family=binomial)
 
 summary(logm_did_i)
 ```
-
-
-
-
-
-
-filter out the treated immigrants after age>65
+Citizen–Immigrant Models
 ```{r}
-#
-df_dy_comb_no_treated_immg <- df_dy_comb |>
-  filter(!(Citizen == 0 & treatment == 1))
-```
+library(stargazer)
 
-proportion of retirement
-```{r}
-# dataset of retirement prop (grouped by age and citizenship)
-df_dy_comb_grouped <- df_dy_comb|>
-    group_by(AGEGRP,Citizen) |>
-    summarise(prop_retire=mean(Retired))
-```
-
-plot the trends over time
-```{r}
-ggplot(df_dy_comb_grouped, aes(x = AGEGRP, y = prop_retire, color = factor(Citizen))) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2) +
-  labs(
-    title = "Retirement Proportion by Age Group",
-    x = "Age Group",
-    y = "Proportion Retired",
-    color = "Citizen Status"
-  ) +
-  scale_color_manual(
-    labels = c("Immigrant", "Citizen"),
-    values = c("blue", "red")
-  ) +
-  theme_minimal()
-
-```
-
-
-
-## Data Filtering & Rationail
-
-We start by excluding cases where `pkids` or `LFACT` are not available or not applicable. Then we create a binary `Retired` variable based on `LFACT` codes 11, 12, and 13.
-
-```{r}
-df <- df %>%
-  # 1) Exclude PKIDS = 8 or 9 (not available / not applicable)
-  filter(AGEGRP %in% c(13, 14, 15, 16, 17, 18, 19, 20, 21)) %>%
-  
-  # 2) Exclude LFACT = 88 or 99 (not available / not applicable)
-  filter(!LFACT %in% c(14, 88, 99)) %>%
-  
-  # 3) Define Retired = 1 if LFACT is 11, 12, or 13, else 0
-  mutate(
-    Retired = if_else(LFACT %in% c(11, 12, 13), 1, 0)
-  )
-
-#table(df$pkids, useNA = "ifany")       # Should show only 0 or 1 now
-#table(df$LFACT, useNA = "ifany")       # No 88 or 99
-#table(df$Retired, useNA = "ifany")     # Distribution of your new retired indicator
-
-#df_selected <- df %>%
-  select(pkids, LFACT, Retired)
-
-# Print the first few rows of the selected columns
-#head(df_selected)
-```
-
-```{r}
-library(scales)  # for percent formatting
-
-# Summarize the data by group (here using 'AGEGRP') and labour force status
-df_summary <- df %>%
-  group_by(AGEGRP, Retired) %>%
-  summarize(count = n()) %>%
-  ungroup()
-
-# Create a 100% stacked bar chart
-ggplot(df_summary, aes(x = factor(AGEGRP), y = count, fill = factor(Retired))) +
-  geom_bar(stat = "identity", position = "fill") +  # position = "fill" makes each bar 100%
-  scale_y_continuous(labels = percent_format()) +
-  labs(
-    x = "Age Group",
-    y = "Percentage of People",
-    fill = "Retired\n(1 = Yes)"
-  ) +
-  theme_minimal()
-
-```
-
-```{r}
-df_summary <- df %>%
-  group_by(AGEGRP) %>%
-  summarize(
-    n = n(),
-    retired_count = sum(Retired),
-    not_retired_count = n() - sum(Retired)
-  )
-```
-
-```{r}
-# Suppose df_summary is sorted by AGEGRP in ascending order
-# Find the rows corresponding to AGEGRP = 16 and 17
-grp16 <- df_summary %>% filter(AGEGRP == 16)
-grp17 <- df_summary %>% filter(AGEGRP == 17)
-
-prop.test(
-  x = c(grp16$retired_count, grp17$retired_count),   # number of "successes" (retired)
-  n = c(grp16$n, grp17$n)                           # total individuals in each group
+stargazer(
+  lm_baseline_c_i, lm_did_c_i, logm_did_c_i,
+  type = "html",
+  out = "table_citizen_immigrant.html",
+  title = "Citizen-Immigrant Models: OAS Elibility Effects",
+  column.labels = c("Baseline", "DID (LPM)", "DID (Logit)"),
+  covariate.labels = c("Post", "Eligible", "Post × Eligible"),
+  dep.var.labels = "Retired",
+  omit.stat = c("f", "ser"),
+  report = "vc*",
+  digits = 3,
+  no.space = TRUE,
+  align = TRUE,
+  notes = "Standard errors in parentheses. *** p<0.01, ** p<0.05, * p<0.1"
 )
 
+
 ```
+
+
+
+ Immigrant-Only Models
+```{r}
+stargazer(
+  lm_baseline_i, lm_did_i, logm_did_i,
+  type = "html",
+  out = "table_immigrant_only.html",
+  title = "Immigrant-Only Models: OAS Elibility Effects",
+  column.labels = c("Baseline", "DID (LPM)", "DID (Logit)"),
+  covariate.labels = c("Post", "Eligible", "Post × Eligible"),
+  dep.var.labels = "Retired",
+  omit.stat = c("f", "ser"),
+  report = "vc*",
+  digits = 3,
+  no.space = TRUE,
+  align = TRUE,
+  notes = "Standard errors in parentheses. *** p<0.01, ** p<0.05, * p<0.1"
+)
+
+
+```
+
+
+
+
 
 
 
